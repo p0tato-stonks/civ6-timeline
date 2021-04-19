@@ -509,15 +509,15 @@ function getStats() {
 
     // function to generate the scrollIntoView function
     function generateScrollJS(id) {
-        return `document.getElementById('moment_${id}').scrollIntoView({
-            block: 'center',
-            inline: 'center',
-            behavior: 'smooth',
+        return `document.getElementById(&quot;moment_${id}&quot;).scrollIntoView({
+            block: &quot;center&quot;,
+            inline: &quot;center&quot;,
+            behavior: &quot;smooth&quot;,
         }); statisticsModal.close(); highlightMoment(${id});`;
     }
 
     // world wonders HTML
-    var wwHTML = worldWonders.map(ww => `<span onclick="${generateScrollJS(ww.Id)}">${ww.name}</span>`).join(", ");
+    var wwHTML = worldWonders.map(ww => `<span onclick='${generateScrollJS(ww.Id)}'>${ww.name}</span>`).join(', ');
 
     // return html 
     return `
@@ -530,17 +530,9 @@ function getStats() {
             `<span onclick="${generateScrollJS(firstNaturalWonder.Id)}">${firstNaturalWonder.name}</span>` : "None"}</div>
             
             <div class="stat">World Wonders built:
-                ${worldWonders.length > 0 ? `
-                    <div id="showHideToggle" class="hidden" onclick="
-                        if ($('#showHideToggle').hasClass('hidden')) {
-                            let wwHTML = \`${wwHTML}\`
-                            $('#showHide').html(wwHTML);
-                            $('#showHideToggle').removeClass('hidden').html('Show less');
-                        } else {
-                            $('#showHide').html('');
-                            $('#showHideToggle').addClass('hidden').html('Show all');
-                        }
-                    ">Show all</div>` : "None"}
+                ${worldWonders.length > 0 ? (
+            worldWonders.length > 3 ? `<div id="showHideToggle" class="hidden" onclick="worldWondersToggle(\`${wwHTML}\`)">Show all</div>`
+                : wwHTML) : "None"}
                     <div id="showHide"></div>
             </div>
             
@@ -560,10 +552,20 @@ function getStats() {
 
             <div class="stat allEras">
                 ${Object.entries(bestEraData).map(era => {
-                return `${getEra(era[0])} Era: <span>${era[1]}</span>`;
-            }).join("<br />")}
+                    return `${getEra(era[0])} Era: <span>${era[1]}</span>`;
+                }).join("<br />")}
             </div>
             <div style="font-size: 11px;" class="mt-2">Era score totals do not include dedications.<br/></div>
         </div>
     </div>`;
+}
+
+function worldWondersToggle(html) {
+    if ($('#showHideToggle').hasClass('hidden')) {
+        $('#showHide').html(html);
+        $('#showHideToggle').removeClass('hidden').html('Show less');
+    } else {
+        $('#showHide').html('');
+        $('#showHideToggle').addClass('hidden').html('Show all');
+    }
 }

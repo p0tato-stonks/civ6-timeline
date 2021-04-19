@@ -76,6 +76,9 @@ code {
     text-decoration: underline;
 }
 
+
+
+/* TIMELINE */
 #timeline {
     background-color: var(--main-background-theme);
     padding: 100px 50px 125px 0;
@@ -119,7 +122,6 @@ code {
 }
 
 #timeline .moment {
-    /* display: inline-block; */
     width: 300px;
     white-space: normal;
     margin: 0 20px;
@@ -184,10 +186,14 @@ code {
 }
 
 .momentTooltip img {
-    border-radius: 2px;
+    border-radius: 2.5px;
     margin: 0 2px;
 }
+/* END TIMELINE */
 
+
+
+/* TIMELINE SETTINGS */
 #prettydropdown-select-player ul {
     border-radius: 10px;
     padding: 0;
@@ -264,12 +270,11 @@ code {
 .scrolltoEra:hover {
     background-color: #aaa;
 }
-
-.searchPopover {
-    z-index: 0 !important;
-}
+/* END TIMELINE SETTINGS */
 
 
+
+/* FOOTER BUTTONS */
 #uploadNew, #statistics {
     margin-top: 50px;
     font-size: 14px;
@@ -297,8 +302,14 @@ code {
     text-decoration: underline #bbb;
 }
 
+.allEras {
+    font-size: 12px;
+}
+
 #showHideToggle {
     cursor: pointer;
+    color: rgb(75, 75, 75);
+    display: inline;
 }
 #showHideToggle::after {
     content: '';
@@ -315,30 +326,14 @@ code {
 #showHideToggle:not(.hidden)::after {
     transform: rotate(-180deg);
 }
-
-.collapseTrigger {
-    cursor: pointer;
+#showHideToggle:not(.hidden) ~ #showHide {
+    padding-bottom: 10px;
 }
-.collapseTrigger::after {
-    content: '';
-    display: inline-block;
-    margin-left: 10px;
-    margin-bottom: 1px;
-    transition: .2s ease-in-out;
-    width: 0;
-    height: 0;
-    border-left: 5px solid transparent;
-    border-right: 5px solid transparent;
-    border-top: 5px solid grey;
-}
-.collapseTrigger:not(.collapsed)::after {
-    transform: rotate(-180deg);
-}
-.allEras, .allEras {
-    font-size: 12px !important;
-}
+/* END FOOTER BUTTONS */
 
 
+
+/* HOMEPAGE */
 .file-upload {
     background-color: transparent;
     width: 600px;
@@ -434,3 +429,4 @@ code {
     border: 0;
     transition: all .2s ease;
 }
+/* END HOMEPAGE */
