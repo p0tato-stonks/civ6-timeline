@@ -226,14 +226,21 @@ function generateTimeline(players, selectedPlayerID, moments, options) {
 
         // timeline
         var timeline = $('<div id="timeline" class="timeline"></div>');
-        let current;
+        let currentEra;
         moments.forEach(moment => {
-            if (current != moment.GameEra) {
+            if (currentEra != moment.GameEra) {
                 timeline.append(`<div class="eraDivider" id="${moment.GameEra}_DIV">${getEra(moment.GameEra)}  Era</div>`)
             }
-            current = moment.GameEra;
+            currentEra = moment.GameEra;
+
+            console.log(moment)
+
+            let momentImg = getMomentImg(moment.InstanceDescription, moment.Type, currentEra);
 
             timeline.append(`<div id="moment_${moment.Id}" class="moment">
+                ${momentImg ? (
+                    `<img class="${momentImg.type === 'small' ? "momentImgSmall" : "momentImg"}" src="${momentImg.src}">`
+                ) : ""}
                 <p class="momentTitle">${formatMoment(moment.Type)}</p>
                 <p class="momentDescription">${moment.InstanceDescription}</p>
                 ${options.tooltips ? `<div class="momentTooltip">${formatMomentTooltip(moment.Type)}</div>` : ""}
