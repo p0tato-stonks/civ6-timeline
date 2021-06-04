@@ -22,7 +22,7 @@ function readFile(input) {
 
                 // filter players and moments
                 let players = json.Players.filter(p => p.CivilizationDescription.includes("Empire"));
-                let moments = json.Moments.filter(m => m.EraScore > 0 || m.Type.startsWith("MOMENT_GAME_ERA_STARTED_WITH"));
+                let moments = json.Moments.filter(m => m.EraScore > 0 || m.Type.startsWith("MOMENT_GAME_ERA_STARTED_WITH") || m.Type === "MOMENT_CLIMATE_CHANGE_PHASE");
 
                 // add players and moments to localstorage
                 window.localStorage.setItem("players", JSON.stringify(players));
@@ -237,16 +237,21 @@ function generateTimeline(players, selectedPlayerID, moments, options) {
 
             let momentImg = getMomentImg(moment.Type, moment.InstanceDescription, getEra(currentEra));
 
-            timeline.append(`<div id="moment_${moment.Id}" class="moment ${momentImg.type === "small" ? "momentSmall" : ""}">
-                ${momentImg.type === "large" ? `<img class="momentImg" src="${momentImg.src}">` : ""}
-                <p class="momentTitle">${momentImg.type === "small" ? `<img class="momentImgSmall" src="${momentImg.src}">` : ""}${formatMoment(moment.Type)}</p>
-                <p class="momentDescription">${moment.InstanceDescription}</p>
-                ${options.tooltips ? `<div class="momentTooltip">${formatMomentTooltip(moment.Type)}</div>` : ""}
-                ${options.details ? `<div class="momentDetails">
-                    <p>Turn ${moment.Turn.toString()}</p>
-                    <p> | ${getEra(moment.GameEra)} Era</p>
-                    ${moment.EraScore > 0 ? `<p> | +${moment.EraScore.toString()} Era Score</p>` : ""}
-                </div>` : ""}
+            timeline.append(`<div id="moment_${moment.Id}" class="moment${momentImg.type === "small" ? " momentSmall" : ""}">
+                ${momentImg.type === "large" ? `<div class="imgLargeContainer"><img class="momentImg" src="${momentImg.src}"></div><div class="momentInner">` : ""}
+                
+                    ${momentImg.type === "small" ? `<div class="imgSmallContainer"><img class="momentImgSmall" src="${momentImg.src}"></div>` : ""}
+                    <div class="momentText">
+                        <p class="momentTitle">${formatMoment(moment.Type)}</p>
+                        <p class="momentDescription">${moment.InstanceDescription}</p>
+                        ${options.tooltips ? `<div class="momentTooltip">${formatMomentTooltip(moment.Type)}</div>` : ""}
+                        ${options.details ? `<div class="momentDetails">
+                            <p>Turn ${moment.Turn.toString()}</p>
+                            <p> | ${getEra(moment.GameEra)} Era</p>
+                            ${moment.EraScore > 0 ? `<p> | +${moment.EraScore.toString()} Era Score</p>` : ""}
+                    </div>` : ""}
+                ${momentImg.type === "large" ? "</div>" : ""}
+                </div>
             </div>`);
         });
 
