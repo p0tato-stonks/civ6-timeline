@@ -48,13 +48,17 @@ function formatMomentTooltip(moment) {
 
 const mainDLCs = ["Rise and Fall", "Gathering Storm"];
 const dlcs = ["Rise and Fall", "Gathering Storm", "Australia", "Indonesia and Khmer", "Macedonia and Persia", "Nubia", "Poland", "Vikings Wonders"];
-function getMomentImg(moment, text, era) {
+function getMomentImg(moment, text, era, colorize) {
     let img;
     mainDLCs.forEach(dlc => {
         if (typeof imageRefs[dlc][moment] !== "undefined") {
             let dlcImage = imageRefs[dlc][moment];
             if (dlcImage.endsWith(".png")) {
-                img = `assets/historic moment images/large/${dlc}/${dlcImage}`;
+                if (colorize) {
+                    img = `assets/historic moment images/colorized/CHM_${dlcImage}`;
+                } else {
+                    img = `assets/historic moment images/large/${dlc}/${dlcImage}`;
+                }
             } else {
                 img = dlcImage;
             }
@@ -68,23 +72,44 @@ function getMomentImg(moment, text, era) {
                 src: img,
             };
         } else if (img.endsWith(".customimage")) {
-            let uniqueImg = getUniqueImg(img.replace(".customimage", ""), text, era);
+            let uniqueImg = getUniqueImg(img.replace(".customimage", ""), text, era, colorize);
 
             if (uniqueImg.endsWith(".png")) {
+                if (colorize) {
+                    return {
+                        type: "large",
+                        src: `assets/historic moment images/colorized/CHM_${uniqueImg}`
+                    }
+                } else {
+                    return {
+                        type: "large",
+                        src: `assets/historic moment images/large/${uniqueImg}`
+                    };
+                }
+            } else {
+                if (colorize) {
+                    return {
+                        type: "small",
+                        src: `assets/historic moment images/colorized/CHM_${uniqueImg}.png`
+                    }
+                } else {
+                    return {
+                        type: "small",
+                        src: `assets/historic moment images/small/${uniqueImg}.png`
+                    };
+                }
+            }
+        } else {
+            if (colorize) {
                 return {
-                    type: "large",
-                    src: `assets/historic moment images/large/${uniqueImg}`
-                };
+                    type: "small",
+                    src: `assets/historic moment images/colorized/CHM_${img}.png`
+                }
             } else {
                 return {
                     type: "small",
-                    src: `assets/historic moment images/small/${uniqueImg}.png`
-                };
-            }
-        } else {
-            return {
-                type: "small",
-                src: `assets/historic moment images/small/${img}.png`,
+                    src: `assets/historic moment images/small/${img}.png`,
+                }
             }
         }
     } else {
@@ -92,25 +117,41 @@ function getMomentImg(moment, text, era) {
     }
 }
 
-function getUniqueImg(illustration, text, era) {
+function getUniqueImg(illustration, text, era, colorize) {
     let obj = customImgRefs[illustration];
 
     if (obj.type === "era") {
         for (i = 0; i < obj.data.length; i++) {
             let value = obj.data[i];
             if (typeof value.era === "object" ? value.era.includes(era) : value.era === era) {
-                return `${value.dlc}/${value.src}`;
+                if (colorize) {
+                    return value.src;
+                } else {
+                    return `${value.dlc}/${value.src}`;
+                }
             }
         }
-        return obj.default;
+        if (colorize && obj.defaultColorized) {
+            return obj.defaultColorized
+        } else {
+            return obj.default;
+        }
     } else if (obj.type === "unique") {
         for (i = 0; i < obj.data.length; i++) {
             let value = obj.data[i];
             if (text.includes(value.find)) {
-                return `${value.dlc}/${value.src}`;
+                if (colorize) {
+                    return value.src;
+                } else {
+                    return `${value.dlc}/${value.src}`;
+                }
             }
         }
-        return obj.default;
+        if (colorize && obj.defaultColorized) {
+            return obj.defaultColorized
+        } else {
+            return obj.default;
+        }
     }
 }
 
@@ -601,7 +642,8 @@ let customImgRefs = {
             { era: ["Ancient", "Classical", "Medieval", "Renaissance", "Industrial", "Modern"], src: "Moment_FirstAirUnitEarlyGame.png", dlc: "Rise and Fall" },
             { era: ["Atomic", "Information", "Future"], src: "Moment_FirstAirUnitLateGame.png", dlc: "Rise and Fall" },
         ],
-        default: "Rise and Fall/Moment_FirstAirUnitEarlyGame.png"
+        default: "Rise and Fall/Moment_FirstAirUnitEarlyGame.png",
+        defaultColorized: "Moment_FirstAirUnitEarlyGame.png"
     },
     "MOMENT_ILLUSTRATION_SEA_UNIT_ERA": {
         type: "era",
@@ -609,7 +651,8 @@ let customImgRefs = {
             { era: ["Ancient", "Classical", "Medieval"], src: "Moment_FirstSeaUnitEarly.png", dlc: "Rise and Fall" },
             { era: ["Renaissance", "Industrial", "Modern", "Atomic", "Information", "Future"], src: "Moment_FirstSeaUnitMid.png", dlc: "Rise and Fall" },
         ],
-        default: "Rise and Fall/Moment_FirstSeaUnitMid.png"
+        default: "Rise and Fall/Moment_FirstSeaUnitMid.png",
+        defaultColorized: "Moment_FirstSeaUnitMid.png"
     },
     "MOMENT_ILLUSTRATION_UNIQUE_UNIT": {
         type: "unique",
@@ -624,7 +667,8 @@ let customImgRefs = {
     "MOMENT_ILLUSTRATION_GOVERNMENT": {
         type: "unique",
         data: [],
-        default: "Rise and Fall/Moment_Government_ClassicalRepublic.png"
+        default: "Rise and Fall/Moment_Government_ClassicalRepublic.png",
+        defaultColorized: "Moment_Government_ClassicalRepublic.png"
     },
     "MOMENT_ILLUSTRATION_GAME_ERA": {
         type: "era",

@@ -20,6 +20,7 @@
 
     --secondary-theme: #3d9ee3;
     --secondary-background-theme: #2568c4;
+    
 }
 
 * {
@@ -79,10 +80,32 @@ code {
 
 
 /* TIMELINE */
-#timeline {
-    background-color: var(--main-background-theme);
-    padding: 40px 50px 50px 0;
+#civTitle {
+    color: #B7C2CA;
+    text-transform: uppercase;
+    user-select: none;
+    font-size: 36px;
+    font-family: "civilization", sans-serif;
+    text-shadow: 2px 0 5px #00bbff;
     margin-top: 50px;
+    background-image: linear-gradient(#031E34, #0C385B);
+    border-bottom: 2px solid black;
+}
+#civTitle::before {
+    display: block;
+    content: "";
+    border-top: 3px solid var(--main-background-theme);
+    border-bottom: 2px solid black;
+}
+
+#timeline-settings {
+    margin-top: 20px;
+}
+
+#timeline {
+    /* background-color: var(--main-background-theme); */
+    background-image: url("historic moment images/blank/Timeline_Background.png");
+    padding: 40px 50px 50px 0;
     width: 100%;
     overflow-x: scroll;
     display: flex;
@@ -125,58 +148,59 @@ code {
     width: 456px;
     white-space: normal;
     margin: 0 20px;
-    /* background-color: #8a7e32; */
     color: #D9CC84;
     border-radius: 10px;
     padding: 10px 5px;
     text-shadow: 0 .8px 1px #706728;
-    /* box-shadow: 0 0 5px .5px #4a441b; */
     cursor: default;
     transition: .2s ease-in-out;
 }
 
-#timeline .moment:not(.momentSmall) {
+#timeline .moment:not(.momentSmall):not(.momentColored) {
     background-image: url("historic moment images/blank/Moment_Blank.png");
     background-repeat: no-repeat;
+    background-size: 460px 350px;
 }
 
 #timeline .moment.highlighted {
     background-color: #b8a246 !important;
     box-shadow: none !important;
 }
+#timeline .moment.highlighted .momentInner {
+    background-color: transparent !important;
+}
 
 #timeline .moment .momentInner {
     background-color: #8a7e32;
     border-radius: 10px;
+    margin-top: 12px;
+    transition: .2s ease-in-out;
+    box-shadow: 0 0 5px .5px #4a441b;
 }
-#timeline .moment .momentInner::before {
-    content: "";
-    display: block;
-    margin-top: 15px;
-    transform: translateY(-7.5px);
-    border-top: solid black 1.5px;
+#timeline .moment .momentInner .momentText {
+    display: flex;
+    flex-direction: column;
+    flex-wrap: wrap;
+    flex: 1;
+    min-height: 150px;
+    height: fit-content;
+    justify-content: center;
 }
-#timeline .moment .momentInner::after {
-    content: "";
-    display: block;
-    transform: translateY(7.5px);
-    border-bottom: solid black 1.5px;
+#timeline .moment .momentInner .momentText *:not(.momentTitle) {
+    margin: 0 auto;
+}
+#timeline .moment .momentInner .momentText.hasDetails .momentTitle {
+    margin-top: auto !important;
+}
+#timeline .moment .momentInner .momentDetails {
+    align-self: flex-end;
+    margin-top: auto !important;
+    margin-bottom: 5px !important;
 }
 
 #timeline .moment.momentSmall {
     background-color: #8a7e32;
-}
-#timeline .moment.momentSmall::before {
-    content: "";
-    display: block;
-    transform: translateY(-7.5px);
-    border-top: solid black 1.5px;
-}
-#timeline .moment.momentSmall::after {
-    content: "";
-    display: block;
-    transform: translateY(7.5px);
-    border-bottom: solid black 1.5px;
+    box-shadow: 0 0 5px .5px #4a441b;
 }
 
 #timeline .moment .momentTitle {
@@ -188,12 +212,11 @@ code {
 
 #timeline .moment .momentDescription {
     width: 416px;
-    margin: 0 10px;
 }
 
 #timeline .moment .momentDetails {
-    margin: 25px 0 5px 0;
     user-select: none;
+    color: #c4b872;
 }
 
 #timeline .moment .momentDetails p {
@@ -250,6 +273,7 @@ code {
 #timeline .moment.momentSmall .momentDetails {
     margin-top: 10px;
 }
+/* END SMALL MOMENTS */
 /* END TIMELINE */
 
 
@@ -322,29 +346,29 @@ code {
     text-align: center;
     padding: 5px 7.5px;
     border-radius: 10px;
-    background-color: #bbb;
+    background-color: var(--main-background-theme);
     transition: .1s ease-in-out;
 }
 .scrolltoEra:not(:first-child):not(:last-child) {
     margin: 7.5px 0;
 }
 .scrolltoEra:hover {
-    background-color: #aaa;
+    background-color: var(--main-theme);
 }
 /* END TIMELINE SETTINGS */
 
 
 
 /* FOOTER BUTTONS */
-#uploadNew, #statistics {
+#uploadNew, .footerButton {
     margin-top: 50px;
-    font-size: 14px;
+    font-size: 14px !important;
 }
-#statistics {
+.footerButton {
     margin-right: 20px;
 }
 
-.statisticsDiv {
+.statisticsDiv, .gameStatsDiv {
     font-family: 'Poppins', sans-serif;
     font-size: 15px;
 }

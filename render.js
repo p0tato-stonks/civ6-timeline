@@ -1,6 +1,7 @@
 // globals
-var optionTitles = ["tooltips", "goodyhuts", "details"];
+var optionTitles = ["tooltips", "goodyhuts", "details", "colorize"];
 var statisticsModal = null;
+var gameStatsModal = null;
 var scrolltoDivPopover = null;
 
 // timeline rendering
@@ -28,7 +29,7 @@ function readFile(input) {
                 window.localStorage.setItem("players", JSON.stringify(players));
                 window.localStorage.setItem("moments", JSON.stringify(moments));
 
-                let options = { goodyhuts: true, details: true, tooltips: true };
+                let options = { goodyhuts: true, details: true, tooltips: true, colorize: false };
                 optionTitles.map(o => {
                     if (window.localStorage.getItem(o)) {
                         options[o] = JSON.parse(window.localStorage.getItem(o));
@@ -233,15 +234,14 @@ function generateTimeline(players, selectedPlayerID, moments, options) {
             }
             currentEra = moment.GameEra;
 
-            // console.log(moment)
+            // huge thanks to the steam mod "Colorized Historic Moments": https://steamcommunity.com/sharedfiles/filedetails/?id=1679150838
+            let momentImg = getMomentImg(moment.Type, moment.InstanceDescription, getEra(currentEra), options.colorize ? true : false);
 
-            let momentImg = getMomentImg(moment.Type, moment.InstanceDescription, getEra(currentEra));
-
-            timeline.append(`<div id="moment_${moment.Id}" class="moment${momentImg.type === "small" ? " momentSmall" : ""}">
+            timeline.append(`<div id="moment_${moment.Id}" class="moment${momentImg.type === "small" ? " momentSmall" : ""}${options.colorize ? " momentColored" : ""}">
                 ${momentImg.type === "large" ? `<div class="imgLargeContainer"><img class="momentImg" src="${momentImg.src}"></div><div class="momentInner">` : ""}
                 
                     ${momentImg.type === "small" ? `<div class="imgSmallContainer"><img class="momentImgSmall" src="${momentImg.src}"></div>` : ""}
-                    <div class="momentText">
+                    <div class="momentText${options.details ? " hasDetails" : ""}">
                         <p class="momentTitle">${formatMoment(moment.Type)}</p>
                         <p class="momentDescription">${moment.InstanceDescription}</p>
                         ${options.tooltips ? `<div class="momentTooltip">${formatMomentTooltip(moment.Type)}</div>` : ""}
@@ -255,17 +255,26 @@ function generateTimeline(players, selectedPlayerID, moments, options) {
             </div>`);
         });
 
+        var civTitle = $(`<div id="civTitle" class="civTitle">History of the ${players[selectedPlayerID].CivilizationAdjective} Empire</div>`)
+
         // add timeline to DOM
         if (parent === "timeline") {
+            $("#civTitle").replaceWith(civTitle);
             $("#timeline").replaceWith(timeline);
         } else {
-            $(`#app`).append(timeline);
+            $("#app").append(civTitle);
+            $("#app").append(timeline);
+        }
+
+        // remove the "Civilization VI Timeline Viewer" header
+        if ($("#title")) {
+            $("#title").remove();
         }
 
         // add civ history info and upload new timeline buttons
         if ($("#uploadNew").length == 0) {
             $("#app").append($(`
-                <button class="btn btn-info" id="statistics">Civilization History Info</button>
+                <button class="btn btn-info footerButton" id="statistics">Civilization History Info</button>
             `));
 
             $("#app").append($(`<button class="btn btn-warning" id="uploadNew" onclick="window.location.href=window.location.pathname">
@@ -281,7 +290,7 @@ function generateTimeline(players, selectedPlayerID, moments, options) {
             width: 400,
             title: `Civilization History Info - ${getCivName(getCivNameByID(parseInt($("#select-player").val().split("_")[1])).Civilization)}`,
             draggable: "title",
-            content: getStats(),
+            content: getCivStats(),
             overlay: false,
             offset: { y: -35 },
         });
@@ -324,6 +333,7 @@ function generateTimeline(players, selectedPlayerID, moments, options) {
                 }
                 document.getElementById('timeline').scrollLeft -= (delta * 20);
             }, 2.5);
+            document.getElementById("timelineMovement").play();
             e.preventDefault();
         }
         if (document.getElementById('timeline').addEventListener) {
@@ -393,6 +403,10 @@ function getTimelineOptionsCheckboxes() {
         saveOption(o);
     }); regenTimelineSettings();" id="timeline-options">
         <div class="popoverTitle">Settings</div>
+         <label class="optionLabel">
+            <input type="checkbox" value="colorize" ${options["colorize"] ? "checked" : ""}>
+            Colorize Historic Moments</label>
+
         <label class="optionLabel">
             <input type="checkbox" value="tooltips" ${options["tooltips"] ? "checked" : ""}>
             Show tooltips</label>
@@ -417,7 +431,7 @@ function highlightMoment(id) {
     }, 1250);
 }
 
-function getStats() {
+function getCivStats() {
     // moments and players
     let selectedPlayerID = parseInt($("#select-player").val().split("_")[1]);
     let allPlayers = JSON.parse(window.localStorage.getItem("players"));
@@ -436,8 +450,6 @@ function getStats() {
     let bestEraData = {};
     let firstNaturalWonder = null;
     let worldWonders = [];
-    let moreWorldWonders = 0;
-    // let totalWorldWonders = 0;
     let totalGreatPeople = 0;
 
     // set eras
@@ -477,14 +489,10 @@ function getStats() {
 
         // check for the first world wonder the player has built
         if (moment.Type.includes("MOMENT_BUILDING_CONSTRUCTED") && moment.Type.includes("ERA_WONDER")) {
-            // if (worldWonders.length < 6) {
             worldWonders.push({
                 Id: moment.Id,
                 name: moment.InstanceDescription.split("Standing in the")[1].split(", the citizens of")[0].trim()
             });
-            // } else {
-            //     moreWorldWonders++;
-            // }
         }
 
         // add great person to total
