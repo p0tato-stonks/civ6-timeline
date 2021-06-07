@@ -1,8 +1,9 @@
 // globals
-var optionTitles = ["tooltips", "goodyhuts", "details", "colorize"];
+var optionTitles = ["tooltips", "goodyhuts", "details", "colorize", "audio"];
 var statisticsModal = null;
 var gameStatsModal = null;
 var scrolltoDivPopover = null;
+var audioElem = null;
 
 // timeline rendering
 function readFile(input) {
@@ -29,11 +30,12 @@ function readFile(input) {
                 window.localStorage.setItem("players", JSON.stringify(players));
                 window.localStorage.setItem("moments", JSON.stringify(moments));
 
-                let options = { goodyhuts: true, details: true, tooltips: true, colorize: false };
+                let options = { goodyhuts: true, details: true, tooltips: true, colorize: false, audio: true };
                 optionTitles.map(o => {
                     if (window.localStorage.getItem(o)) {
                         options[o] = JSON.parse(window.localStorage.getItem(o));
                     } else {
+                        console.log(options[o])
                         window.localStorage.setItem(o, options[o].toString());
                     }
                 });
@@ -204,7 +206,7 @@ function regenTimeline() {
 
 function generateTimeline(players, selectedPlayerID, moments, options) {
     try {
-        // empty app children if no timeline, and show loading spinner
+        // empty app children if no timeline
         var parent;
         if ($("#timeline").length == 0) {
             // generate settings
@@ -321,26 +323,36 @@ function generateTimeline(players, selectedPlayerID, moments, options) {
                 createTooltip(moment.Id, moment.Type);
             });
         }
+
         // add timeline horizontal scrolling
         function scrollHorizontally(e) {
             e = window.event || e;
             var delta = Math.max(-1, Math.min(1, (e.wheelDelta || -e.detail)));
             let timesRun = 0;
-            var interval = setInterval(function () {
-                timesRun++;
-                if (timesRun == 30) {
-                    clearInterval(interval);
-                }
-                document.getElementById('timeline').scrollLeft -= (delta * 20);
-            }, 2.5);
-            document.getElementById("timelineMovement").play();
+
+            // TODO
+            // document.getElementById("timeline").scrollLeft -= delta * 600;
+            // var interval = setInterval(function () {
+            //     timesRun++;
+            //     if (timesRun == 30) {
+            //         clearInterval(interval);
+            //     }
+            //     document.getElementById("timeline").scrollLeft -= (delta * 20);
+            // }, 2.5);
+
+            // play audio
+            if (options.audio) {
+                audioElem = new Audio("assets/audio/Timeline_Movement.mp3")
+                audioElem.play()
+            }
+
             e.preventDefault();
         }
-        if (document.getElementById('timeline').addEventListener) {
-            document.getElementById('timeline').addEventListener("mousewheel", scrollHorizontally, false);
-            document.getElementById('timeline').addEventListener("DOMMouseScroll", scrollHorizontally, false);
+        if (document.getElementById("timeline").addEventListener) {
+            document.getElementById("timeline").addEventListener("mousewheel", scrollHorizontally, false);
+            document.getElementById("timeline").addEventListener("DOMMouseScroll", scrollHorizontally, false);
         } else {
-            document.getElementById('timeline').attachEvent("onmousewheel", scrollHorizontally);
+            document.getElementById("timeline").attachEvent("onmousewheel", scrollHorizontally);
         }
 
         // initialize player selection dropdown
@@ -369,7 +381,7 @@ function generateTimeline(players, selectedPlayerID, moments, options) {
 // HELPER FUNCTIONS
 ////////////////////////////////
 function b64DecodeUnicode(str) {
-    // going backwards: from bytestream, to percent-encoding, to original string.
+    // going backwards: from bytestream, to percent-encoding, to original string
     return decodeURIComponent(atob(str).split('').map(function (c) {
         return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
     }).join(''));
@@ -405,7 +417,7 @@ function getTimelineOptionsCheckboxes() {
         <div class="popoverTitle">Settings</div>
          <label class="optionLabel">
             <input type="checkbox" value="colorize" ${options["colorize"] ? "checked" : ""}>
-            Colorize Historic Moments</label>
+            Colorize historic moments</label>
 
         <label class="optionLabel">
             <input type="checkbox" value="tooltips" ${options["tooltips"] ? "checked" : ""}>
@@ -418,7 +430,12 @@ function getTimelineOptionsCheckboxes() {
         <label class="optionLabel">
             <input type="checkbox" value="details" ${options["details"] ? "checked" : ""}>
             Show moment details</label>
-        </form>`;
+        </form>
+        
+        <label class="optionLabel">
+            <input type="checkbox" value="audio" ${options["audio"] ? "checked" : ""}>
+            Timeline scrolling audio<label>
+        `;
 }
 
 function highlightMoment(id) {

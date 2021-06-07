@@ -16,7 +16,7 @@ $(document).ready(function () {
             let players = JSON.parse(window.localStorage.getItem("players"));
             let moments = JSON.parse(window.localStorage.getItem("moments"));
 
-            let options = { goodyhuts: true, details: true, tooltips: false };
+            let options = { goodyhuts: true, details: true, tooltips: true, colorize: false, audio: true };
             optionTitles.map(o => {
                 if (window.localStorage.getItem(o)) {
                     options[o] = JSON.parse(window.localStorage.getItem(o));
